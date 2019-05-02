@@ -1,8 +1,12 @@
 import Vue from 'vue'
 import App from './App.vue'
+import router from './routes'
 
-Vue.config.productionTip = false
+import Button from './components/UI/button.vue'
+
+Vue.component('app-button', Button);
 
 new Vue({
-  render: h => h(App),
+  router,
+  render: h => h(App)
 }).$mount('#app')
