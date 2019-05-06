@@ -12,7 +12,8 @@ const admin = {
         authFailed: false,
         refreshLoading: true,
         addPost: false,
-        imageUpload: null
+        imageUpload: null,
+        adminPosts:  null
     },
     getters: {
         isAuth(state) {
@@ -29,9 +30,15 @@ const admin = {
         },
         imageUpload(state) {
             return state.imageUpload;
+        },
+        getAdminPosts(state) {
+            return state.adminPosts;
         }
     },
     mutations: {
+        getAdminPosts(state, posts) {
+            state.adminPosts = posts;
+        },
         imageUpload(state, imageData) {
             state.imageUpload = imageData.secure_url;
         },
@@ -73,6 +80,35 @@ const admin = {
         }
     },
     actions: {
+        deletePost({commit, state}, payload) {
+            Vue.http.delete(`posts/${payload}.json?auth=${state.token}`)
+            .then( response => {
+                let newPosts = [];
+
+                state.adminPosts.forEach( post => {
+                    if(post.id != payload) {
+                        newPosts.push(post);
+                    }
+                });
+                
+                commit('getAdminPosts', newPosts);
+            });
+        },
+        getAdminPosts({commit}) {
+            Vue.http.get('posts.json')
+            .then( response => response.json())
+            .then( response => {
+                const posts = [];
+
+                for(let key in response) {
+                    posts.push({
+                        ...response[key],
+                        id: key
+                    })
+                }
+                commit('getAdminPosts', posts.reverse());
+            })
+        },
         signIn({commit}, payload) {
             Vue.http.post(`${FbAuth}/verifyPassword?key=${FbApiKey}`, {
                 ...payload,
