@@ -11,6 +11,7 @@
                 <input 
                     type="file"
                     @change="processFile($event)"
+                    ref="myFileInput"
                 >
             </div>
 
@@ -113,6 +114,7 @@ export default {
             let status = this.$store.getters['admin/addPostStatus'];
             if(status) {
                 this.clearPost();
+                this.$store.commit('admin/clearImageUpload');
             }
             return status;
         },
@@ -143,11 +145,13 @@ export default {
         },
         clearPost() {
             this.$v.$reset();
+            this.$refs.myFileInput.value = '';
             this.formData = {
                 title: '',
                 desc: '',
                 content: '',
-                rating: ''
+                rating: '',
+                img: ''
             }
         },
         submitHandler() {
@@ -171,6 +175,9 @@ export default {
             this.dialog = false;
             this.addPost();
         }
+    },
+    destroyed() {
+        this.$store.commit('admin/clearImageUpload');
     }
 }
 </script>
