@@ -9,7 +9,8 @@ const admin = {
     state: {
         token: null,
         refresh: null,
-        authFailed: false
+        authFailed: false,
+        refreshLoading: true
     },
     getters: {
         isAuth(state) {
@@ -17,9 +18,15 @@ const admin = {
                 return true;
             }
             return false;
+        },
+        refreshLoading(state) {
+            return state.refreshLoading;
         }
     },
     mutations: {
+        refreshLoading(state) {
+            state.refreshLoading = false;
+        },
         authUser(state, authData) {
             state.token = authData.idToken;
             state.refresh = authData.refreshToken;
@@ -80,9 +87,13 @@ const admin = {
                         type: 'refresh'
                     });
 
+                    commit('refreshLoading');
+
                     localStorage.setItem("token", authData.id_token);
                     localStorage.setItem("refresh", authData.refresh_token);
                 })
+            } else {
+                commit('refreshLoading');
             }
         }
     }
