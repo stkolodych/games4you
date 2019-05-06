@@ -2,6 +2,18 @@
     <div class="dashboard_form">
         <h1>ADD POSTS</h1>
         <form @submit.prevent="submitHandler">
+
+            <div v-if="imageUpload">
+                <img :src="imageUpload">
+            </div>
+
+            <div class="input_field">
+                <input 
+                    type="file"
+                    @change="processFile($event)"
+                >
+            </div>
+
             <div 
                 class="input_field"
                 :class="{'invalid': $v.formData.title.$error}"
@@ -91,7 +103,8 @@ export default {
                 title: '',
                 desc: '',
                 content: '',
-                rating: ''
+                rating: '',
+                img: ''
             }
         }
     },
@@ -102,6 +115,11 @@ export default {
                 this.clearPost();
             }
             return status;
+        },
+        imageUpload() {
+            let imageUrl = this.$store.getters['admin/imageUpload'];
+            this.formData.img = imageUrl;
+            return imageUrl;
         }
     },
     validations: {
@@ -119,6 +137,10 @@ export default {
         }
     },
     methods: {
+        processFile(event) {
+            let file = event.target.files[0];
+            this.$store.dispatch('admin/imageUpload', file);
+        },
         clearPost() {
             this.$v.$reset();
             this.formData = {
